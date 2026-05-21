@@ -1,11 +1,18 @@
 package NewProject.example.hospital.management.system.Entity;
 
-import NewProject.example.hospital.management.system.Type.BloodType;
+import NewProject.example.hospital.management.system.Entity.Type.BloodType;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.Builder;
+
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @ToString
@@ -45,4 +52,10 @@ public class Patient {
 
      @Enumerated(EnumType.STRING)
      private BloodType bloodGroup;
+
+     @OneToMany(mappedBy = "patient",cascade = CascadeType.ALL)
+     private List<Insurance> insurances;
+
+     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
+     private List<Appointment> appointments; //  inverse side
 }

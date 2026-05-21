@@ -1,4 +1,4 @@
-package NewProject.example.hospital.management.system.Type;
+package NewProject.example.hospital.management.system.Entity.Type;
 
 public enum  BloodType {
 
