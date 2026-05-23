@@ -27,13 +27,13 @@ public class Appointment {
     private LocalDateTime appointmentDate;
 
     @Column(length = 500)
-    private String Description;
+    private String reason;
 
     @ManyToOne
-    @JoinColumn(name = "patient_id") // Owing side , patient is required and not nullable
+    @JoinColumn(name = "patient_id",nullable = false) // Owing side , patient is required and not nullable
     private Patient patient;
 
     @ManyToOne
-    @JoinColumn(nullable = false)
+    @JoinColumn(nullable = false, name ="Doctor_id")
     private Doctor doctor;
 }
