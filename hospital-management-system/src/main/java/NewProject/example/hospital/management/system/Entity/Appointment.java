@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 @ToString
 @Getter
 @Builder
-public class Appointment {
+public class  Appointment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
