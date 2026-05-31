@@ -12,6 +12,7 @@ import lombok.Builder;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -53,9 +54,11 @@ public class Patient {
      @Enumerated(EnumType.STRING)
      private BloodType bloodGroup;
 
-     @OneToMany(mappedBy = "patient",cascade = CascadeType.ALL)
+     @OneToMany(mappedBy = "patient",cascade = {CascadeType.MERGE,CascadeType.PERSIST})
+     @ToString.Exclude
      private List<Insurance> insurances;
 
-     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
-     private List<Appointment> appointments; //  inverse side
+     @OneToMany(mappedBy = "patient", cascade = {CascadeType.REMOVE},orphanRemoval = true)
+     @ToString.Exclude
+     private List<Appointment> appointments = new ArrayList<>();
 }
