@@ -1,15 +1,20 @@
 package NewProject.example.hospital.management.system.Service;
 
+import NewProject.example.hospital.management.system.DTO.Appointment.AppointmentRequestDTO;
+import NewProject.example.hospital.management.system.DTO.Appointment.AppointmentResponseDTO;
 import NewProject.example.hospital.management.system.Entity.Appointment;
 import NewProject.example.hospital.management.system.Entity.Doctor;
 import NewProject.example.hospital.management.system.Entity.Patient;
 import NewProject.example.hospital.management.system.Repository.AppointmentRepository;
 import NewProject.example.hospital.management.system.Repository.DoctorRepository;
 import NewProject.example.hospital.management.system.Repository.PatientRepository;
+import NewProject.example.hospital.management.system.mapper.AppointmentMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -17,6 +22,7 @@ public class AppointmentService {
 
     private final AppointmentRepository appointmentRepository;
     private final PatientRepository patientRepository;
+    private final AppointmentMapper appointmentMapper;
     private final DoctorRepository doctorRepository;
 
     @Transactional
@@ -32,6 +38,51 @@ public class AppointmentService {
         patient.getAppointments().add(appointment);// to maintain consistency
 
         return appointmentRepository.save(appointment);
+    }
+
+
+    @Transactional
+    public AppointmentResponseDTO createNewAppointment(
+            Long patientId,
+            AppointmentRequestDTO appointmentDTO) {
+
+        Patient patient = patientRepository.findById(patientId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Patient not found with id: " + patientId
+                ));
+
+        if (appointmentDTO.getDoctorId() == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "doctorId is required"
+            );
+        }
+
+        if (appointmentDTO.getAppointmentDate() == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "appointmentDate is required"
+            );
+        }
+
+        Doctor doctor = doctorRepository.findById(appointmentDTO.getDoctorId())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Doctor not found with id: " + appointmentDTO.getDoctorId()
+                ));
+
+        Appointment appointment = appointmentMapper
+                .appointmentRequestDTOToAppointment(appointmentDTO);
+
+        appointment.setPatient(patient);
+        appointment.setDoctor(doctor);
+
+        Appointment savedAppointment =
+                appointmentRepository.save(appointment);
+
+        return appointmentMapper
+                .appointmentToAppointmentResponseDTO(savedAppointment);
     }
 
 
