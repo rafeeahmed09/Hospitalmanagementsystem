@@ -11,10 +11,13 @@ import NewProject.example.hospital.management.system.Repository.PatientRepositor
 import NewProject.example.hospital.management.system.mapper.AppointmentMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +44,7 @@ public class AppointmentService {
     }
 
 
+    // PostMapping
     @Transactional
     public AppointmentResponseDTO createNewAppointment(
             Long patientId,
@@ -85,5 +89,32 @@ public class AppointmentService {
                 .appointmentToAppointmentResponseDTO(savedAppointment);
     }
 
+   // GETwithPAtientId
+    public List<AppointmentResponseDTO> getAllListAppointment(
+            Integer pageNumber,
+            Integer pageSize,
+            Long patientId) {
 
+        return appointmentRepository
+                .findByPatientId(
+                        patientId,
+                        PageRequest.of(pageNumber, pageSize)
+                )
+                .getContent()
+                .stream()
+                .map(appointmentMapper::appointmentToAppointmentResponseDTO)
+                .toList();
+    }
+    // OnlyGetALlListAppointment
+    public List<AppointmentResponseDTO> getListAppointment(
+            Integer pageNumber,
+            Integer pageSize) {
+
+        return appointmentRepository
+                .findAll(PageRequest.of(pageNumber, pageSize))
+                .getContent()
+                .stream()
+                .map(appointmentMapper::appointmentToAppointmentResponseDTO)
+                .toList();
+    }
 }

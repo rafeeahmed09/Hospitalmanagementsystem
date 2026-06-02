@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/Appointment")
 @AllArgsConstructor
@@ -28,4 +30,30 @@ public class AppointmentController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(savedAppointment);
     }
+    @GetMapping("/patient/{patientId}")
+    public ResponseEntity<List<AppointmentResponseDTO>> getAppointmentsByPatient(
+            @PathVariable Long patientId,
+            @RequestParam(defaultValue = "0") Integer pageNumber,
+            @RequestParam(defaultValue = "10") Integer pageSize) {
+
+        return ResponseEntity.ok(
+                appointmentService.getAllListAppointment(
+                        pageNumber,
+                        pageSize,
+                        patientId
+                )
+        );
+    }
+    @GetMapping
+    public ResponseEntity<List<AppointmentResponseDTO>> getAllAppointment(
+            @RequestParam(defaultValue = "0") Integer pageNumbers,
+            @RequestParam(defaultValue = "10") Integer pageSizes) {
+
+        return ResponseEntity.ok(
+                appointmentService.getListAppointment(
+                        pageNumbers,
+                        pageSizes
+                ));
+    }
+
 }
