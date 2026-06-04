@@ -19,7 +19,7 @@ public class AppointmentController {
     private final AppointmentService appointmentService;
     private final PatientServices patientServices;
 
-    @PostMapping("/patient/{patientId}")
+    @PostMapping("/patient-id/{patientId}")
     public ResponseEntity<AppointmentResponseDTO> CreateAppointment(
             @PathVariable Long patientId,
             @RequestBody AppointmentRequestDTO appointment
@@ -30,7 +30,17 @@ public class AppointmentController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(savedAppointment);
     }
-    @GetMapping("/patient/{patientId}")
+    @PostMapping("/patient-name/{patientName}")
+    public ResponseEntity<AppointmentResponseDTO> CreateAppointment(
+            @PathVariable String patientName,
+            @RequestBody AppointmentRequestDTO appointment
+    ){
+        AppointmentResponseDTO savedAppointment =
+                appointmentService.createFirstnameAppointment(patientName,appointment);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(savedAppointment);
+    }
+    @GetMapping("/patient-id/{patientId}")
     public ResponseEntity<List<AppointmentResponseDTO>> getAppointmentsByPatient(
             @PathVariable Long patientId,
             @RequestParam(defaultValue = "0") Integer pageNumber,
@@ -55,5 +65,19 @@ public class AppointmentController {
                         pageSizes
                 ));
     }
+
+    @DeleteMapping("/id/{id}")
+    public ResponseEntity<String> deleteAppointment(
+            @PathVariable Long id
+    ){
+        appointmentService.deleteAppointment(id);
+        return ResponseEntity.ok(
+                "Appointment with id " + id + "deleted successfully"
+        );
+    }
+
+//    @DeleteMapping("/name/{firstName}")
+
+
 
 }

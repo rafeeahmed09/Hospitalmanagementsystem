@@ -117,4 +117,61 @@ public class AppointmentService {
                 .map(appointmentMapper::appointmentToAppointmentResponseDTO)
                 .toList();
     }
+
+    @Transactional
+    // DeletedBid;
+    public void deleteAppointment(Long id) {
+        Appointment appointment = appointmentRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Appointment not found with id: " + id
+                ));
+
+        appointmentRepository.deleteById(appointment.getId());
+    }
+
+    public AppointmentResponseDTO createFirstnameAppointment(
+            String patientName,
+            AppointmentRequestDTO appointmentDTO) {
+
+        Patient patient = patientRepository.findByFirstName(patientName)
+                .stream()
+                .findFirst()
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Patient not found with name: " + patientName
+                ));
+
+        if (appointmentDTO.getDoctorId() == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "doctorId is required"
+            );
+        }
+
+        if (appointmentDTO.getAppointmentDate() == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "appointmentDate is required"
+            );
+        }
+
+        Doctor doctor = doctorRepository.findById(appointmentDTO.getDoctorId())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Doctor not found with id: " + appointmentDTO.getDoctorId()
+                ));
+
+        Appointment newAppointment = appointmentMapper
+                .appointmentRequestDTOToAppointment(appointmentDTO);
+
+        newAppointment.setPatient(patient);
+        newAppointment.setDoctor(doctor);
+
+        Appointment savedAppointment =
+                appointmentRepository.save(newAppointment);
+
+        return appointmentMapper
+                .appointmentToAppointmentResponseDTO(savedAppointment);
+    }
 }
