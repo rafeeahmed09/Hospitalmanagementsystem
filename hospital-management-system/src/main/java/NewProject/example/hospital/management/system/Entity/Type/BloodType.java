@@ -9,5 +9,6 @@ public enum  BloodType {
     AB_Negative,
     AB_Positive,
     O_Positive,
-    O_Negative
+    O_Negative;
+
 }
