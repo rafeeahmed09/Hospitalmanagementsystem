@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "Hospital Management System",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}

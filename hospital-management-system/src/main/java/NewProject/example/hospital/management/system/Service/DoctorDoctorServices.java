@@ -13,6 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class DoctorDoctorServices {
@@ -50,12 +53,19 @@ public class DoctorDoctorServices {
     }
 
     @Transactional
-    public Doctor getDoctorAll(Long doctorId) {
-        return doctorRepository.findById(doctorId)
+    public DoctorResponseDTO getDoctorById(Long doctorId) {
+        Doctor doctor = doctorRepository.findById(doctorId)
                 .orElseThrow(() ->
                         new ResponseStatusException(
                                 HttpStatus.NOT_FOUND,
                                 "Doctor not found with id: " + doctorId
                         ));
+        return doctorMapper.DOCTOR_RESPONSE_DTO(doctor);
+    }
+
+    public List<DoctorResponseDTO> getAllDoctors() {
+        return doctorRepository.findAll().stream()
+                .map(doctorMapper::DOCTOR_RESPONSE_DTO)
+                .collect(Collectors.toList());
     }
 }
