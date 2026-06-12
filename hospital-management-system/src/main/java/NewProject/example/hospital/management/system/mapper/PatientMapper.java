@@ -5,7 +5,6 @@ import NewProject.example.hospital.management.system.DTO.Patient.PatientResponse
 import NewProject.example.hospital.management.system.Entity.Patient;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
-
 @Mapper(componentModel = "spring")
 public interface PatientMapper {
 

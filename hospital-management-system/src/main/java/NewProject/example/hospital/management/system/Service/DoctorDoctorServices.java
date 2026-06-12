@@ -68,4 +68,12 @@ public class DoctorDoctorServices {
                 .map(doctorMapper::DOCTOR_RESPONSE_DTO)
                 .collect(Collectors.toList());
     }
+
+    @Transactional
+    public void deleteDoctorById(long id) {
+        if (!doctorRepository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Doctor not found with id: " + id);
+        }
+        doctorRepository.deleteById(id);
+    }
 }
