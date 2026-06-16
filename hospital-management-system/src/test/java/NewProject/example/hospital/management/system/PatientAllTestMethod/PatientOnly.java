@@ -45,7 +45,8 @@ public class PatientOnly {
     void createPatientWorks() {
         long patientCountBeforeCreate = patientRepository.count();
 
-        PatientRequestDTO requestDTO = PatientRequestDTO.builder()
+        PatientRequestDTO requestDTO =
+                PatientRequestDTO.builder()
                 .firstName("Test Patient")
                 .birthDate(LocalDate.of(1999, 2, 11))
                 .email("test.patient.post@example.com")
