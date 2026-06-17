@@ -8,6 +8,7 @@ import NewProject.example.hospital.management.system.Repository.PatientRepositor
 import NewProject.example.hospital.management.system.mapper.PatientMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PatientServices {
 
+    @Autowired
     private final PatientRepository patientRepository;
+    @Autowired
     private final PatientMapper patientMapper;
 
     @Transactional
@@ -86,13 +89,14 @@ public class PatientServices {
                 .map(patientMapper::patientToPatientResponseDTO)
                 .collect(Collectors.toList());
     }
-
+    @Transactional
     public void deletePatient(Long id) {
         Patient patient = patientRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Patient not found with id: " + id));
         patientRepository.delete(patient);
     }
 
+    @Transactional
     public void deleteByName(String firstName) {
         List<Patient> patients = patientRepository.findByFirstName(firstName);
 
