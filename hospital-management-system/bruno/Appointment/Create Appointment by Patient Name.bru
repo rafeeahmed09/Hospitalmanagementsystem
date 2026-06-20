@@ -1,0 +1,19 @@
+meta {
+  name: Create Appointment by Patient Name
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:8080/Appointment/patient-name/JohnDoe
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "appointmentDate": "2026-06-01T14:00:00",
+    "reason": " checkup",
+    "doctorId": 3
+  }
+}
