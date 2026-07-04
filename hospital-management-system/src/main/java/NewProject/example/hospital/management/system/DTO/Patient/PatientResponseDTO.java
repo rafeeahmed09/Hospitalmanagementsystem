@@ -22,4 +22,5 @@ public class PatientResponseDTO {
     private String gender;
     private LocalDate createDate;
     private BloodType bloodGroup;
+    private Boolean deleted;
 }

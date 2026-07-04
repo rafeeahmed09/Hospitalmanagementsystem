@@ -28,6 +28,7 @@ public class  Appointment {
 
     @Column(length = 500)
     private String reason;
+    private Boolean deleted;
 
     @ManyToOne
     @JoinColumn(name = "patient_id",nullable = false) // Owing side , patient is required and not nullable

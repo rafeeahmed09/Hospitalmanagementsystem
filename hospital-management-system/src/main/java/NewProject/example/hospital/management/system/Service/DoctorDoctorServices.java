@@ -47,6 +47,7 @@ public class DoctorDoctorServices {
         }
 
         Doctor newDoctor = doctorMapper.DOCTORRequestDTOTODoctor(doctorRequestDTO);
+        newDoctor.setDeleted(false);
         Doctor savedDoctor = doctorRepository.save(newDoctor);
 
         return doctorMapper.DOCTOR_RESPONSE_DTO(savedDoctor);

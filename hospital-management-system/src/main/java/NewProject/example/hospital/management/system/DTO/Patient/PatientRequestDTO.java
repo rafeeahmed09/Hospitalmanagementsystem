@@ -24,5 +24,6 @@ public class PatientRequestDTO {
     private String email;
     private String gender;
     private BloodType bloodGroup;
+    private Boolean deleted;
 
 }

@@ -24,6 +24,7 @@ public class Insurance {
 
     @Column(nullable = false,length = 100)
     private String provider;
+    private Boolean deleted;
 
     @Column(nullable = false)
     private LocalDate validUntil;

@@ -18,6 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,8 +31,8 @@ public class PatientServices {
     private final PatientMapper patientMapper;
 
     @Transactional
-    public List<PatientResponseDTO> getALLPatient(Integer pageNumber,Integer pageSIze){
-        return patientRepository.findAll(PageRequest.of(pageNumber,pageSIze))
+    public List<PatientResponseDTO> getAllPatient() {
+        return patientRepository.findAll()
                 .stream()
                 .map(patientMapper::patientToPatientResponseDTO)
                 .collect(Collectors.toList());
@@ -39,8 +40,11 @@ public class PatientServices {
     
     @Transactional
     public Patient getPatientById(Long id){
-             return patientRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Patient not found with id " + id));
+             return patientRepository.findByIdAndDeletedFalse(id)
+                     .orElseThrow(() -> new ResponseStatusException(
+                             HttpStatus.NOT_FOUND,
+                             "Patient not found with id: " + id
+                     ));
     }
 
     @Transactional
@@ -71,6 +75,7 @@ public class PatientServices {
         }
 
         Patient newPatient = patientMapper.patientRequestDTOToPatient(patientRequestDTO);
+        newPatient.setDeleted(false);
         Patient savedPatient = patientRepository.save(newPatient);
 
         return patientMapper.patientToPatientResponseDTO(savedPatient);
@@ -80,7 +85,11 @@ public class PatientServices {
     public List<PatientResponseDTO> createMultiplePatients(List<PatientRequestDTO> patientRequestDTOs) {
 
         List<Patient> patients = patientRequestDTOs.stream()
-                .map(patientMapper::patientRequestDTOToPatient)
+                .map(patientRequestDTO -> {
+                    Patient patient = patientMapper.patientRequestDTOToPatient(patientRequestDTO);
+                    patient.setDeleted(false);
+                    return patient;
+                })
                 .collect(Collectors.toList());
 
         List<Patient> savedPatients = patientRepository.saveAll(patients);
@@ -171,4 +180,22 @@ public class PatientServices {
         Patient updatedPatient = patientRepository.save(patient);
         return patientMapper.patientToPatientResponseDTO(updatedPatient);
     }
+
+    public Boolean deleteBySoft(Long id) {
+        Optional<Patient> patientOptional = patientRepository.findByIdAndDeletedFalse(id);
+
+        if (patientOptional.isEmpty()) {
+            return false;
+        }
+
+        Patient patient = patientOptional.get();
+        patient.setDeleted(true);
+
+        patientRepository.save(patient);
+
+        return true;
+    }
+
+
+
 }

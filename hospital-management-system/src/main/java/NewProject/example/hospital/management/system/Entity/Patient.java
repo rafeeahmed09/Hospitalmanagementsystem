@@ -44,6 +44,7 @@ public class Patient {
 
     @Column(unique = true, nullable = false)
     private String email;
+    private Boolean deleted;
 
     private String gender;
 
