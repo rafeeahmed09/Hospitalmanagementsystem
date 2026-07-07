@@ -1,5 +1,6 @@
 package NewProject.example.hospital.management.system.Entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -32,6 +33,7 @@ public class  Appointment {
 
     @ManyToOne
     @JoinColumn(name = "patient_id",nullable = false) // Owing side , patient is required and not nullable
+    @JsonBackReference
     private Patient patient;
 
     @ManyToOne

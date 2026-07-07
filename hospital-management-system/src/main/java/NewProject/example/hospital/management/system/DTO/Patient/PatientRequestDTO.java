@@ -1,6 +1,7 @@
 package NewProject.example.hospital.management.system.DTO.Patient;
 
 import NewProject.example.hospital.management.system.Entity.Type.BloodType;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,6 +21,7 @@ public class PatientRequestDTO {
 
     private Long id;
     private String firstName;
+    @JsonFormat(pattern = "yyyy-M-d")
     private LocalDate birthDate;
     private String email;
     private String gender;

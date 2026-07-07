@@ -1,13 +1,13 @@
 package NewProject.example.hospital.management.system.Entity;
 
 import NewProject.example.hospital.management.system.Entity.Type.BloodType;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.Builder;
 
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -55,11 +55,12 @@ public class Patient {
      @Enumerated(EnumType.STRING)
      private BloodType bloodGroup;
 
-     @OneToMany(mappedBy = "patient",cascade = {CascadeType.MERGE,CascadeType.PERSIST})
+     @OneToMany(mappedBy = "patient",cascade = {CascadeType.ALL},orphanRemoval = true)
+
      @ToString.Exclude
      private List<Insurance> insurances;
 
-     @OneToMany(mappedBy = "patient", cascade = {CascadeType.REMOVE},orphanRemoval = true)
-     @ToString.Exclude
-     private List<Appointment> appointments = new ArrayList<>();
+     @OneToMany(mappedBy = "patient", cascade = {CascadeType.ALL},orphanRemoval = true)
+     @JsonManagedReference
+     private List<Appointment> appointments;
 }

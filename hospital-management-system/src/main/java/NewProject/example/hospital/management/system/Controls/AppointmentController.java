@@ -17,7 +17,6 @@ import java.util.List;
 public class AppointmentController {
 
     private final AppointmentService appointmentService;
-    private final PatientServices patientServices;
 
     @PostMapping("/patient-id/{patientId}")
     public ResponseEntity<AppointmentResponseDTO> CreateAppointment(

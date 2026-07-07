@@ -165,9 +165,8 @@ public class PatientServices {
                     break;
                 case "bloodGroup":
                     if (value != null) {
-                        String enumValue = ((String) value).toUpperCase().trim();
                         try {
-                            patient.setBloodGroup(BloodType.valueOf(enumValue));
+                            patient.setBloodGroup(BloodType.fromValue((String) value));
                         } catch (IllegalArgumentException e) {
                             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid blood group: " + value);
                         }
