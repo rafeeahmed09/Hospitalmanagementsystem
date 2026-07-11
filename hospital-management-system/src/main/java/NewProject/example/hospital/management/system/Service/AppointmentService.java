@@ -119,15 +119,11 @@ public class AppointmentService {
     }
 
     @Transactional
-    // DeletedBid;
     public void deleteAppointment(Long id) {
-        Appointment appointment = appointmentRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Appointment not found with id: " + id
-                ));
-
-        appointmentRepository.deleteById(appointment.getId());
+        if (!appointmentRepository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Appointment not found with id: " + id);
+        }
+        appointmentRepository.deleteById(id);
     }
 
     public AppointmentResponseDTO createFirstnameAppointment(

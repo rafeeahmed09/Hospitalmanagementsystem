@@ -3,7 +3,6 @@ package NewProject.example.hospital.management.system.Controls;
 import NewProject.example.hospital.management.system.DTO.Appointment.AppointmentRequestDTO;
 import NewProject.example.hospital.management.system.DTO.Appointment.AppointmentResponseDTO;
 import NewProject.example.hospital.management.system.Service.AppointmentService;
-import NewProject.example.hospital.management.system.Service.PatientServices;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -65,18 +64,11 @@ public class AppointmentController {
                 ));
     }
 
-    @DeleteMapping("/id/{id}")
-    public ResponseEntity<String> deleteAppointment(
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteAppointment(
             @PathVariable Long id
     ){
         appointmentService.deleteAppointment(id);
-        return ResponseEntity.ok(
-                "Appointment with id " + id + "deleted successfully"
-        );
+        return ResponseEntity.noContent().build();
     }
-
-//    @DeleteMapping("/name/{firstName}")
-
-
-
 }

@@ -2,7 +2,6 @@ package NewProject.example.hospital.management.system.Controls;
 
 import NewProject.example.hospital.management.system.DTO.Patient.PatientRequestDTO;
 import NewProject.example.hospital.management.system.DTO.Patient.PatientResponseDTO;
-import NewProject.example.hospital.management.system.Entity.Patient;
 import NewProject.example.hospital.management.system.Service.PatientServices;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -37,8 +36,8 @@ public class PatientController {
 
 
     @GetMapping("/{patientId}")
-    public ResponseEntity<Patient> getPatientProfile(@PathVariable Long patientId){
-        Patient patient = patientServices.getPatientById(patientId);
+    public ResponseEntity<PatientResponseDTO> getPatientProfile(@PathVariable Long patientId){
+        PatientResponseDTO patient = patientServices.getPatientById(patientId);
         return ResponseEntity.ok(patient);
     }
 
@@ -47,23 +46,18 @@ public class PatientController {
         return ResponseEntity.ok(patientServices.getAllPatient());
     }
 
-    @DeleteMapping("/id/{id}")
-    public ResponseEntity<String> deletePatient(@PathVariable Long id) {
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletePatient(@PathVariable Long id) {
         patientServices.deletePatient(id);
-        return ResponseEntity.ok(
-                "Patient deleted successfully with id: " + id
-        );
+        return ResponseEntity.noContent().build();
     }
     
     @DeleteMapping("/name/{firstName}")
-    public ResponseEntity<String> deletePatientsByName(
+    public ResponseEntity<Void> deletePatientsByName(
             @PathVariable String firstName) {
-
         patientServices.deleteByName(firstName);
-
-        return ResponseEntity.ok(
-                " patients with name '" + firstName + "' deleted successfully"
-        );
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{id}")
@@ -74,23 +68,12 @@ public class PatientController {
         return ResponseEntity.ok(updatedPatient);
     }
 
-//    @PatchMapping("/{id}")
-//    public ResponseEntity<PatientResponseDTO> updatePatientPartially(
-//            @PathVariable Long id,
-//            @RequestBody Map<String, Object> updates) {
-//        PatientResponseDTO updatedPatient = patientServices.updatePatientPartially(id, updates);
-//        return ResponseEntity.ok(updatedPatient);
-//    }
-
     @PatchMapping("/deleted-soft/{id}")
-    public  ResponseEntity<String> deletedSoft(@PathVariable Long id){
-        Boolean isDeleted = patientServices.deleteBySoft(id);
-        if(isDeleted){
-            return ResponseEntity.ok("Record deleted");
+    public  ResponseEntity<Void> deletedSoft(@PathVariable Long id){
+        if(patientServices.deleteBySoft(id)){
+            return ResponseEntity.ok().build();
         }
-
         return ResponseEntity.notFound().build();
     }
 
 }
-

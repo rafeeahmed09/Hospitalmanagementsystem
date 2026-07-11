@@ -1,33 +1,29 @@
 package NewProject.example.hospital.management.system.Service;
 
-import NewProject.example.hospital.management.system.DTO.Patient.PatientRequestDTO;
-import NewProject.example.hospital.management.system.DTO.Patient.PatientResponseDTO;
-import NewProject.example.hospital.management.system.Entity.Patient;
-import NewProject.example.hospital.management.system.Entity.Type.BloodType;
-import NewProject.example.hospital.management.system.Repository.PatientRepository;
-import NewProject.example.hospital.management.system.mapper.PatientMapper;
-import jakarta.persistence.EntityNotFoundException;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.springframework.http.HttpStatus;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import NewProject.example.hospital.management.system.DTO.Patient.PatientRequestDTO;
+import NewProject.example.hospital.management.system.DTO.Patient.PatientResponseDTO;
+import NewProject.example.hospital.management.system.Entity.Patient;
+import NewProject.example.hospital.management.system.Repository.PatientRepository;
+import NewProject.example.hospital.management.system.exception.DuplicateResourceException;
+import NewProject.example.hospital.management.system.exception.ResourceNotFoundException;
+import NewProject.example.hospital.management.system.mapper.PatientMapper;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class PatientServices {
 
-    @Autowired
     private final PatientRepository patientRepository;
-    @Autowired
     private final PatientMapper patientMapper;
 
     @Transactional
@@ -37,14 +33,12 @@ public class PatientServices {
                 .map(patientMapper::patientToPatientResponseDTO)
                 .collect(Collectors.toList());
     }
-    
+
     @Transactional
-    public Patient getPatientById(Long id){
-             return patientRepository.findByIdAndDeletedFalse(id)
-                     .orElseThrow(() -> new ResponseStatusException(
-                             HttpStatus.NOT_FOUND,
-                             "Patient not found with id: " + id
-                     ));
+    public PatientResponseDTO getPatientById(Long id) {
+        return patientRepository.findById(id)
+                .map(patientMapper::patientToPatientResponseDTO)
+                .orElseThrow(() -> new ResourceNotFoundException("Patient with id " + id + " not found"));
     }
 
     @Transactional
@@ -54,24 +48,15 @@ public class PatientServices {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "First name is required");
         }
 
-        if (patientRequestDTO.getEmail() == null || patientRequestDTO.getEmail().trim().isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email is required");
+        if (emailExists(patientRequestDTO.getEmail())) {
+            throw new DuplicateResourceException("Patient with email " + patientRequestDTO.getEmail() +
+                    " already exists");
         }
 
-        boolean emailExists = patientRepository.existsByEmail(patientRequestDTO.getEmail());
-
-        if (emailExists) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Patient email already exists");
-        }
-
-        if (patientRequestDTO.getBirthDate() != null) {
-            boolean patientExists = patientRepository.existsByFirstNameAndBirthDate(
-                    patientRequestDTO.getFirstName(), patientRequestDTO.getBirthDate()
-            );
-
-            if (patientExists) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "Patient with same first name and birth date already exists");
-            }
+        if (patientRequestDTO.getBirthDate() != null && patientRepository.existsByFirstNameAndBirthDate(
+                patientRequestDTO.getFirstName(), patientRequestDTO.getBirthDate()
+        )) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Patient with same first name and birth date already exists");
         }
 
         Patient newPatient = patientMapper.patientRequestDTOToPatient(patientRequestDTO);
@@ -83,13 +68,23 @@ public class PatientServices {
 
     @Transactional
     public List<PatientResponseDTO> createMultiplePatients(List<PatientRequestDTO> patientRequestDTOs) {
+        Set<String> emailsInBatch = new HashSet<>();
+        // Validation pass
+        for (PatientRequestDTO dto : patientRequestDTOs) {
+            if (dto.getFirstName() == null || dto.getFirstName().trim().isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "First name is required for all patients in the batch.");
+            }
+            if (dto.getEmail() == null || !emailsInBatch.add(dto.getEmail())) {
+                throw new DuplicateResourceException("Duplicate email found in batch: " + dto.getEmail());
+            }
+            if (emailExists(dto.getEmail())) {
+                throw new DuplicateResourceException("Patient with email " + dto.getEmail() + " already exists.");
+            }
+        }
 
         List<Patient> patients = patientRequestDTOs.stream()
-                .map(patientRequestDTO -> {
-                    Patient patient = patientMapper.patientRequestDTOToPatient(patientRequestDTO);
-                    patient.setDeleted(false);
-                    return patient;
-                })
+                .map(patientMapper::patientRequestDTOToPatient)
+                .peek(patient -> patient.setDeleted(false))
                 .collect(Collectors.toList());
 
         List<Patient> savedPatients = patientRepository.saveAll(patients);
@@ -98,11 +93,13 @@ public class PatientServices {
                 .map(patientMapper::patientToPatientResponseDTO)
                 .collect(Collectors.toList());
     }
+
     @Transactional
     public void deletePatient(Long id) {
-        Patient patient = patientRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Patient not found with id: " + id));
-        patientRepository.delete(patient);
+        if (!patientRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Patient with id " + id + " not found");
+        }
+        patientRepository.deleteById(id);
     }
 
     @Transactional
@@ -119,8 +116,8 @@ public class PatientServices {
     @Transactional
     public PatientResponseDTO updateOldPatient(Long id, PatientRequestDTO dto) {
         Patient patient = patientRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Patient not found with id: " + id));
-        
+                .orElseThrow(() -> new ResourceNotFoundException("Patient with id " + id + " not found"));
+
         if (dto.getFirstName() != null && !dto.getFirstName().trim().isEmpty()) {
             patient.setFirstName(dto.getFirstName());
         }
@@ -145,56 +142,16 @@ public class PatientServices {
     }
 
     @Transactional
-    public PatientResponseDTO updatePatientPartially(Long id, Map<String, Object> updates) {
-        Patient patient = patientRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Patient not found with id: " + id));
-
-        updates.forEach((key, value) -> {
-            switch (key) {
-                case "firstName":
-                    patient.setFirstName((String) value);
-                    break;
-                case "birthDate":
-                    patient.setBirthDate(LocalDate.parse((String) value));
-                    break;
-                case "email":
-                    patient.setEmail((String) value);
-                    break;
-                case "gender":
-                    patient.setGender((String) value);
-                    break;
-                case "bloodGroup":
-                    if (value != null) {
-                        try {
-                            patient.setBloodGroup(BloodType.fromValue((String) value));
-                        } catch (IllegalArgumentException e) {
-                            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid blood group: " + value);
-                        }
-                    } else {
-                        patient.setBloodGroup(null);
-                    }
-                    break;
-            }
-        });
-        Patient updatedPatient = patientRepository.save(patient);
-        return patientMapper.patientToPatientResponseDTO(updatedPatient);
+    public boolean deleteBySoft(Long id) {
+        return patientRepository.findByIdAndDeletedFalse(id)
+                .map(patient -> {
+                    patient.setDeleted(true);
+                    patientRepository.save(patient);
+                    return true;
+                }).orElse(false);
     }
 
-    public Boolean deleteBySoft(Long id) {
-        Optional<Patient> patientOptional = patientRepository.findByIdAndDeletedFalse(id);
-
-        if (patientOptional.isEmpty()) {
-            return false;
-        }
-
-        Patient patient = patientOptional.get();
-        patient.setDeleted(true);
-
-        patientRepository.save(patient);
-
-        return true;
+    private boolean emailExists(String email) {
+        return email != null && patientRepository.existsByEmail(email);
     }
-
-
-
 }

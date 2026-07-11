@@ -13,4 +13,7 @@ public interface PatientMapper {
     PatientResponseDTO patientToPatientResponseDTO(Patient patient);
 
     Patient patientRequestDTOToPatient(PatientRequestDTO patientRequestDTO);
+
 }
+
+
