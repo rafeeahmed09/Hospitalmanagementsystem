@@ -2,7 +2,7 @@ package NewProject.example.hospital.management.system.PatientAllTestMethod;
 
 import NewProject.example.hospital.management.system.Entity.Patient;
 import NewProject.example.hospital.management.system.Repository.PatientRepository;
-import NewProject.example.hospital.management.system.Service.PatientServices;
+import NewProject.example.hospital.management.system.Service.Auth.PatientServices;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

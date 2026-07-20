@@ -1,7 +1,7 @@
 package NewProject.example.hospital.management.system.mapper;
 
-import NewProject.example.hospital.management.system.DTO.Patient.PatientRequestDTO;
-import NewProject.example.hospital.management.system.DTO.Patient.PatientResponseDTO;
+import NewProject.example.hospital.management.system.DTO.Patient.Auth.PatientRequestDTO;
+import NewProject.example.hospital.management.system.DTO.Patient.Auth.PatientResponseDTO;
 import NewProject.example.hospital.management.system.Entity.Patient;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;

@@ -1,8 +1,8 @@
 package NewProject.example.hospital.management.system.Controls;
 
-import NewProject.example.hospital.management.system.DTO.Patient.PatientRequestDTO;
-import NewProject.example.hospital.management.system.DTO.Patient.PatientResponseDTO;
-import NewProject.example.hospital.management.system.Service.PatientServices;
+import NewProject.example.hospital.management.system.DTO.Patient.Auth.PatientRequestDTO;
+import NewProject.example.hospital.management.system.DTO.Patient.Auth.PatientResponseDTO;
+import NewProject.example.hospital.management.system.Service.Auth.PatientServices;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,16 +15,21 @@ import java.util.List;
 public class PatientController {
 
     private final PatientServices patientServices;
-
-
-    @PostMapping
-    public ResponseEntity<PatientResponseDTO> createPatient(
-            @RequestBody PatientRequestDTO patientRequestDTO) {
-
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(patientServices.createNewPatient(patientRequestDTO)
-                );
-    }
+    //@PostMapping
+//    public ResponseEntity<PatientResponseDTO> createPatient(@RequestBody Patient patient) {
+//        PatientRequestDTO patientRequestDTO = PatientRequestDTO.builder()
+//                .id(patient.getId())
+//                .firstName(patient.getFirstName())
+//                .birthDate(patient.getBirthDate())
+//                .email(patient.getEmail())
+//                .gender(patient.getGender())
+//                .bloodGroup(patient.getBloodGroup())
+//                .deleted(patient.getDeleted())
+//                .build();
+//
+//        return ResponseEntity.status(HttpStatus.CREATED)
+//                .body(patientServices.createNewPatient(patientRequestDTO));
+//    }
 
     @PostMapping("/MultiplePatient")
     public ResponseEntity<List<PatientResponseDTO>> createMultiplePatients(
@@ -35,8 +40,16 @@ public class PatientController {
     }
 
 
-    @GetMapping("/{patientId}")
-    public ResponseEntity<PatientResponseDTO> getPatientProfile(@PathVariable Long patientId){
+    @GetMapping("/me")
+    public ResponseEntity<PatientResponseDTO> getMe(){
+        return ResponseEntity.ok(patientServices.getCurrentPatient());
+    }
+    @PutMapping("/me")
+    public ResponseEntity<PatientResponseDTO> updateMe (@RequestBody PatientRequestDTO patientRequestDTO){
+        return ResponseEntity.ok(patientServices.updateCurrentPatient(patientRequestDTO));
+    }
+    @GetMapping("/{Id}")
+    public ResponseEntity<PatientResponseDTO> getPatientProfile( @PathVariable("Id") Long patientId){
         PatientResponseDTO patient = patientServices.getPatientById(patientId);
         return ResponseEntity.ok(patient);
     }

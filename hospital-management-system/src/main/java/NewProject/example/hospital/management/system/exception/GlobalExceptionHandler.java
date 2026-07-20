@@ -7,6 +7,8 @@ import java.util.Map;
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -74,6 +76,22 @@ public class GlobalExceptionHandler {
                                 .body(exceptionResponse);
         }
 
+        @ExceptionHandler(AuthenticationException.class)
+        public ResponseEntity<ExceptionResponseDto> handleAuthenticationException(
+                        AuthenticationException ex,
+                        HttpServletRequest request) {
+                ExceptionResponseDto exceptionResponse = new ExceptionResponseDto(
+                                LocalDateTime.now(),
+                                HttpStatus.UNAUTHORIZED.value(),
+                                HttpStatus.UNAUTHORIZED.getReasonPhrase(),
+                                "Invalid email or password",
+                                request.getRequestURI());
+
+                return ResponseEntity
+                                .status(HttpStatus.UNAUTHORIZED)
+                                .body(exceptionResponse);
+        }
+
         @ExceptionHandler(RuntimeException.class)
         public ResponseEntity<ExceptionResponseDto> HandleRuntimeException(RuntimeException re,
                         HttpServletRequest request) {
@@ -138,5 +156,24 @@ public class GlobalExceptionHandler {
                                 .status(HttpStatus.BAD_REQUEST)
                                 .body(response);
         }
+
+    @ExceptionHandler(UsernameNotFoundException.class)
+    public ResponseEntity<ExceptionResponseDto> handleUsernameNotFoundException(
+            UsernameNotFoundException ex,
+            HttpServletRequest request) {
+
+        ExceptionResponseDto response = new ExceptionResponseDto(
+                LocalDateTime.now(),
+                HttpStatus.NOT_FOUND.value(),
+                HttpStatus.NOT_FOUND.getReasonPhrase(),
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(response);
+    }
+
 
 }

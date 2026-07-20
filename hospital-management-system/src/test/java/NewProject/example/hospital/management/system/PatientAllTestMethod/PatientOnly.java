@@ -1,11 +1,11 @@
 package NewProject.example.hospital.management.system.PatientAllTestMethod;
 
-import NewProject.example.hospital.management.system.DTO.Patient.PatientRequestDTO;
-import NewProject.example.hospital.management.system.DTO.Patient.PatientResponseDTO;
+import NewProject.example.hospital.management.system.DTO.Patient.Auth.PatientRequestDTO;
+import NewProject.example.hospital.management.system.DTO.Patient.Auth.PatientResponseDTO;
 import NewProject.example.hospital.management.system.Entity.Type.BloodType;
 import NewProject.example.hospital.management.system.Entity.Patient;
 import NewProject.example.hospital.management.system.Repository.PatientRepository;
-import NewProject.example.hospital.management.system.Service.PatientServices;
+import NewProject.example.hospital.management.system.Service.Auth.PatientServices;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -20,4 +20,10 @@ public interface PatientRepository extends JpaRepository<Patient,Long> {
 
 
     Optional<Patient> findByIdAndDeletedFalse(Long id);
+
+    Optional<Patient> findByEmail(String email);
+
+    Optional<Patient> findByEmailIgnoreCase(String email);
+
+    Optional<Patient> findFirstByFirstNameIgnoreCase(String firstName);
 }
