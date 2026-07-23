@@ -16,6 +16,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.security.Provider;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -61,7 +62,14 @@ public class Patient implements UserDetails {
      @Enumerated(EnumType.STRING)
      private BloodType bloodGroup;
 
+
     @Enumerated(EnumType.STRING)
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "patient_roles",
+            joinColumns = @JoinColumn(name = "patient_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
      private List<Roles> roles = new ArrayList<>();
 
      @OneToMany(mappedBy = "patient",cascade = {CascadeType.ALL},orphanRemoval = true)

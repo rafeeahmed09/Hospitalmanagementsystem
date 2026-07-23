@@ -27,5 +27,6 @@ public class PatientRequestDTO {
     private String gender;
     private BloodType bloodGroup;
     private Boolean deleted;
-
+    private String password;
+    private String CreateDate;
 }

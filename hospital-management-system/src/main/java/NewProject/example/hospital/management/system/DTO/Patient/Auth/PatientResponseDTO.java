@@ -23,4 +23,5 @@ public class PatientResponseDTO {
     private LocalDate createDate;
     private BloodType bloodGroup;
     private Boolean deleted;
+    private String password;
 }

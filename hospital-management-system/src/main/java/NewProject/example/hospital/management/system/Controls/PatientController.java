@@ -2,6 +2,7 @@ package NewProject.example.hospital.management.system.Controls;
 
 import NewProject.example.hospital.management.system.DTO.Patient.Auth.PatientRequestDTO;
 import NewProject.example.hospital.management.system.DTO.Patient.Auth.PatientResponseDTO;
+import NewProject.example.hospital.management.system.Entity.Patient;
 import NewProject.example.hospital.management.system.Service.Auth.PatientServices;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,21 +16,22 @@ import java.util.List;
 public class PatientController {
 
     private final PatientServices patientServices;
-    //@PostMapping
-//    public ResponseEntity<PatientResponseDTO> createPatient(@RequestBody Patient patient) {
-//        PatientRequestDTO patientRequestDTO = PatientRequestDTO.builder()
-//                .id(patient.getId())
-//                .firstName(patient.getFirstName())
-//                .birthDate(patient.getBirthDate())
-//                .email(patient.getEmail())
-//                .gender(patient.getGender())
-//                .bloodGroup(patient.getBloodGroup())
-//                .deleted(patient.getDeleted())
-//                .build();
-//
-//        return ResponseEntity.status(HttpStatus.CREATED)
-//                .body(patientServices.createNewPatient(patientRequestDTO));
-//    }
+
+    @PostMapping
+    public ResponseEntity<PatientResponseDTO> createPatient(@RequestBody Patient patient) {
+        PatientRequestDTO patientRequestDTO = PatientRequestDTO.builder()
+                .id(patient.getId())
+                .firstName(patient.getFirstName())
+                .birthDate(patient.getBirthDate())
+                .email(patient.getEmail())
+                .gender(patient.getGender())
+                .bloodGroup(patient.getBloodGroup())
+                .deleted(patient.getDeleted())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(patientServices.createNewPatient(patientRequestDTO));
+    }
 
     @PostMapping("/MultiplePatient")
     public ResponseEntity<List<PatientResponseDTO>> createMultiplePatients(
